@@ -3,12 +3,25 @@
 #  Technical Report: Wallet Functionality Implementation
 
 
-- [Technical Report](https://docs.google.com/document/d/1AqPiVgDEPk7bjbab6pGOjmQfwXYaRJGZjDa-DgjjHHs/edit?usp=sharing).
 - [PostMan Documentation Import Link](https://documenter.getpostman.com/view/11719138/2sA3XJmR5z)
 
 ## Introduction
 
-This report outlines the decisions and processes involved in designing and implementing the wallet functionality. The wallet system enables users to perform secure financial transactions, such as sending and receiving funds.
+This report outlines the decisions and processes involved in designing and implementing the wallet functionality. The wallet system enables users to perform secure financial transactions, such as sending and receiving funds. The core setup involves a credit and debit transactions table, a controlBalance table for funds used in administrative settlement and a users table with an is_super_admin column for identifying user types.
+
+Without affecting performance; Users balance can be calculated and retrieved anytime there's a need to get an accurate figure. To improve performance; I would cache users balance using redis for view only purposes. The choice to keep a Control Balance table for admins was made solely on the assumption that such user accounts will be handled by the right internal teams, performance improvements from having the value on a table will be minimal as it'll not be accessed often. I would always favour calculating balance based of transactions 
+
+## Setting up
+
+The env file for this project has been included in github; To aid easy setup on local machines
+
+To run the project, Assuming php, composer, and a php server is already installed, run
+
+- composer install
+- php artisan migrate
+- php artisan db:seed
+- php artisan serve
+
 
 ## Schema Design
 
@@ -42,14 +55,9 @@ The `audit_logs` table records all significant actions and transactions, providi
 ### Laravel
 Laravel was chosen for its robust ecosystem, built-in authentication, and database management capabilities. Key features utilized include Eloquent ORM, middleware, and Sanctum for API authentication.
 
-### Next.js
-Next.js was selected for the frontend due to its support for server-side rendering, easy integration with React, and efficient handling of API routes.
-
 ### Laravel Sanctum
-Sanctum provides a simple solution for API token management and SPA authentication, ensuring secure communication between the frontend and backend.
+Sanctum provides a simple solution for API token management and SPA authentication, ensuring secure communication with the API
 
-### Axios
-Axios was used for making HTTP requests from the Next.js frontend to the Laravel backend, supporting automatic CSRF token handling.
 
 ## Patterns for Safe Concurrency
 
@@ -65,27 +73,16 @@ Row locking prevents race conditions by locking the rows being updated until the
 
 ## Security Measures for Financial Transactions
 
-### CSRF Protection
-Cross-Site Request Forgery (CSRF) protection is implemented to prevent unauthorized commands from being transmitted from a user that the website trusts.
-
-- **Implementation**: Laravel’s built-in CSRF protection is leveraged, and CSRF tokens are included in requests from the Next.js frontend.
-
 ### Audit Logging
 Audit logging tracks all transactions and significant actions, providing a trail that can be reviewed for suspicious activity.
 
 - **Implementation**: Each transaction and action is logged in the `audit_logs` table with details such as user ID, action performed, status, and any anomalies detected.
 
 ### Authentication and Authorization
-Sanctum is used to manage API tokens and ensure that only authenticated and authorized users can perform transactions.
-
-- **Implementation**: Middleware checks ensure that users are authenticated and authorized to perform specific actions. Routes are protected to restrict access to authenticated users only.
+Sanctum is used to manage API tokens and ensure that only authenticated and authorized users can perform certain transactions.
 
 ### Data Encryption
 Sensitive data, such as passwords, are encrypted to prevent unauthorized access.
 
-- **Implementation**: Passwords are hashed using Laravel’s `Hash::make()` function, and sensitive data can be encrypted and decrypted using Laravel’s built-in encryption methods.
 
-## Conclusion
-
-The design and implementation of the wallet functionality involve careful consideration of schema design, library and framework choices, concurrency patterns, and security measures. By leveraging Laravel’s robust features and integrating seamlessly with a Next.js frontend, the system ensures secure and efficient handling of financial transactions. This report outlines the key decisions and strategies employed to create a reliable and secure wallet system.
 
