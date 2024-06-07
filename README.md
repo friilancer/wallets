@@ -3,7 +3,7 @@
 #  Technical Report: Wallet Functionality Implementation
 
 
-- [PostMan Documentation Import Link](https://documenter.getpostman.com/view/11719138/2sA3XJmR5z)
+- [PostMan Documentation](https://documenter.getpostman.com/view/11719138/2sA3XJmR5z)
 
 ## Introduction
 
